@@ -64,3 +64,6 @@ def ingest_matches(per_page: int = PER_PAGE):
         save_raw_data(data)
     else:
         logger.warning("no data to save")
+
+if __name__ == "__main__":
+    ingest_matches()
