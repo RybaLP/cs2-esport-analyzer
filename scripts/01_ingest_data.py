@@ -10,7 +10,7 @@ load_dotenv()
 API_KEY = os.getenv("PANDASCORE_API_KEY")
 BASE_URL = "https://api.pandascore.co/csgo/matches/past"
 RAW_DATA_DIR = "data/raw"
-PER_PAGE = 5
+PER_PAGE = 50
 
 # logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
