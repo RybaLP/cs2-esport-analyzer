@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:15
+    container_name: cs2_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: ${DB_NAME:-cs2_analytics}
+    ports:
+      - "${DB_PORT:-7432}:5432" 
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
