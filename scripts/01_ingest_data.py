@@ -4,6 +4,7 @@ import os
 import logging
 from datetime import datetime
 from dotenv import load_dotenv
+import time
 
 #  config
 load_dotenv()
@@ -21,9 +22,9 @@ def validate_config():
     if not API_KEY:
         raise ValueError("Api Key is not set in .env")
     
-def build_url(per_page: int) -> str:
-    """Build API request URL"""
-    return f"{BASE_URL}?token={API_KEY}&per_page={per_page}"
+def build_url(per_page: int, page: int) -> str:
+    """Build API request URL with pagination support"""
+    return f"{BASE_URL}?token={API_KEY}&per_page={per_page}&page={page}"
 
 def fetch_matches(url:str) -> list:
      """Fetch matches from api"""
@@ -52,18 +53,34 @@ def save_raw_data (data : list):
 
     logger.info(f"rawdata saved to: {file_path}")
 
-def ingest_matches(per_page: int = PER_PAGE):
+def ingest_matches(pages_to_fetch: int = 5):
     """main ingestion pipeline"""
     logger.info("starting data ingestion...")
 
     validate_config()
-    url = build_url(per_page)
-    data = fetch_matches(url)
+    all_data = []
 
-    if data:
-        save_raw_data(data)
+    for page in range(1, pages_to_fetch + 1):
+        current_url = build_url(PER_PAGE, page) 
+        
+        logger.info(f"Fetching page {page}...")
+        
+        data = fetch_matches(current_url) 
+        
+        if data:
+            all_data.extend(data)
+            logger.info(f"Page {page} added. Total matches so far: {len(all_data)}")
+        else:
+            logger.warning(f"No data found on page {page}")
+            break
+        
+        time.sleep(1.5)
+
+    if all_data:
+        save_raw_data(all_data)
+        logger.info(f"Successfully ingested {len(all_data)} matches in total.")
     else:
-        logger.warning("no data to save")
+        logger.warning("No data to save")
 
 if __name__ == "__main__":
     ingest_matches()
