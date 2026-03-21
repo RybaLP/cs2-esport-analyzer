@@ -11,6 +11,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 
 @Service
 @RequiredArgsConstructor
@@ -24,5 +29,17 @@ public class MatchService {
                 .map(matchMapper :: toDTO);
     }
 
+    @Transactional(readOnly = true)
+    public Map<String, Set<String>> getUniqueTeamsAndLeagues() {
 
+        Map<String,Set<String>> response = new HashMap<>();
+
+        Set<String> uniqueTeams = matchRepository.findAllUniqueTeams();
+        Set<String> uniqueLeagues = matchRepository.findAllUniqueLeagues();
+
+        response.put("teams",uniqueTeams);
+        response.put("leagues",uniqueLeagues);
+
+        return response;
+    }
 }

@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Set;
+
 
 @Repository
 public interface MatchRepository extends JpaRepository<Match,Long> {
@@ -20,4 +22,14 @@ public interface MatchRepository extends JpaRepository<Match,Long> {
                               @Param("league") String league,
                               Pageable pageable);
 
+    @Query("SELECT DISTINCT m.league FROM Match m WHERE m.league IS NOT NULL ORDER BY m.league ASC")
+    Set<String> findAllUniqueLeagues();
+
+    @Query(value = "SELECT DISTINCT team FROM (" +
+            "SELECT team1 AS team FROM matches " +
+            "UNION " +
+            "SELECT team2 AS team FROM matches" +
+            ") AS all_teams WHERE team IS NOT NULL ORDER BY team ASC",
+            nativeQuery = true)
+    Set<String> findAllUniqueTeams();
 }
