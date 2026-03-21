@@ -7,6 +7,7 @@ public record MatchDTO(
         String team2,
         String team2Logo,
         String winner,
+        String score,
         String league,
         String date
 ){}

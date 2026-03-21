@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+import java.util.Set;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/matches")
@@ -23,6 +26,11 @@ public class MatchController {
     public ResponseEntity<Page<MatchDTO>> getAllMatches (Pageable pageable,
                                                          @ModelAttribute SearchCriteria searchCriteria) {
         return ResponseEntity.ok(matchService.getMatchesPage(pageable,searchCriteria));
+    }
+
+    @GetMapping("/teams/leagues")
+    public ResponseEntity<Map<String, Set<String>>> getUniqueTeamsAndEvents () {
+        return ResponseEntity.ok(matchService.getUniqueTeamsAndLeagues());
     }
 
 }
