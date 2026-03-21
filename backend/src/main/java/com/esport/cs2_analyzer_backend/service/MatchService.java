@@ -1,7 +1,9 @@
 package com.esport.cs2_analyzer_backend.service;
 
 import com.esport.cs2_analyzer_backend.dto.MatchDTO;
+import com.esport.cs2_analyzer_backend.dto.SearchCriteria;
 import com.esport.cs2_analyzer_backend.mapper.MatchMapper;
+import com.esport.cs2_analyzer_backend.model.Match;
 import com.esport.cs2_analyzer_backend.repository.MatchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,9 +19,10 @@ public class MatchService {
     private final MatchMapper matchMapper;
 
     @Transactional(readOnly = true)
-    public Page<MatchDTO> getMatchesPage(Pageable pageable) {
-        return matchRepository.findAll(pageable)
-                .map(matchMapper::toDTO);
+    public Page<MatchDTO> getMatchesPage(Pageable pageable, SearchCriteria searchCriteria) {
+        return matchRepository.findByFilters(searchCriteria.team(),searchCriteria.league(),pageable)
+                .map(matchMapper :: toDTO);
     }
+
 
 }
