@@ -1,8 +1,9 @@
 import pandas as pd
-from sqlalchemy import create_engine
 import logging
 from dotenv import load_dotenv
 import os
+from kafka import KafkaProducer
+import json
 
 CSV_FILE_PATH = "data/processed/matches_clean.csv"
 
@@ -13,48 +14,32 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv(dotenv_path=".env")
 
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-DB_NAME = os.getenv("DB_NAME")
+KAFKA_BROKER = os.getenv("KAFKA_BROKER")
+TOPIC_NAME = os.getenv("TOPIC_NAME")
 
-
-def get_db_engine():
-    """create and return a sqlalchemy engine using environment variables"""
-    conn_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    return create_engine(conn_string)
-
-
-def load_data():
-    """load csv file into pgsql database."""
+def load_and_send_to_kafka():
     if not os.path.exists(CSV_FILE_PATH):
-        logger.error(f"File not found: {CSV_FILE_PATH}")
+        logger.error("CSV file is empty")
         return
-
     df = pd.read_csv(CSV_FILE_PATH)
-
     if df.empty:
-        logger.warning("csv file is empty")
+        logger.error("CSV file is empty")
         return
+    try: 
+        producer = KafkaProducer(
+            bootstrap_servers=[KAFKA_BROKER],
+            value_serializer=lambda v: json.dumps(v).encode('utf-8')
+        )
+        logger.info(f"Connected to Kafka Broker at: {KAFKA_BROKER}")
 
-    logger.info(f"Loaded {len(df)} rows from {CSV_FILE_PATH}")
+        for _,row in df.iterrows():
+            match_data = row.to_dict()
+            producer.send(TOPIC_NAME,match_data)
 
-    engine = None
-    try:
-        engine = get_db_engine()
-
-        df.to_sql("matches", engine, if_exists="replace", index=False)
-        logger.info(f"Successfully inserted {len(df)} rows into 'matches' table.")
-
+        producer.flush()
+        logger.info(f"Successfully sent {len(df)} matches to Kafka topic '{TOPIC_NAME}'.")
     except Exception as e:
-        logger.error(f"failed to load data into database: {e}")
-
-    finally:
-        if engine:
-            engine.dispose()
-            logger.info("db connection closed")
-
+        logger.error(f"Failed to send data to Kafka: {e}")
 
 if __name__ == "__main__":
-    load_data()
+    load_and_send_to_kafka()
