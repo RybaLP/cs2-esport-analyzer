@@ -26,7 +26,7 @@ export default function MatchList({ matches }: MatchListProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       {matches.map((match) => (
-        <MatchCard key={match.matchId} match={match} />
+        <MatchCard key={match.id} match={match} />
       ))}
     </div>
   );

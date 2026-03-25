@@ -11,4 +11,8 @@ public interface MatchMapper {
 
     @Mapping(source = "id", target = "matchId")
     MatchDTO toDTO(Match match);
+
+    @Mapping(source = "matchId", target = "id")
+    Match toEntity(MatchDTO matchDTO);
+
 }

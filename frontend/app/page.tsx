@@ -1,4 +1,3 @@
-// app/page.tsx
 import { Suspense } from 'react';
 import MatchesPage from './components/matchesPage';
 
