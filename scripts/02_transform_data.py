@@ -99,6 +99,7 @@ def save_processed_data(matches, output_path=PROCESSED_DATA_PATH):
     """save processed data to csv"""
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     df = pd.DataFrame(matches)
+    df = df.where(pd.notnull(df),None)
     df.to_csv(output_path, index=False)
     logger.info(f"Processed data saved to: {output_path}")
 

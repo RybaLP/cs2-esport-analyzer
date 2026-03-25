@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import logging
 from dotenv import load_dotenv
 import os
@@ -22,6 +23,8 @@ def load_and_send_to_kafka():
         logger.error("CSV file is empty")
         return
     df = pd.read_csv(CSV_FILE_PATH)
+    df = df.replace({np.nan: None})
+
     if df.empty:
         logger.error("CSV file is empty")
         return
