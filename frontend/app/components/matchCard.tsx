@@ -22,6 +22,10 @@ export default function MatchCard({ match }: MatchCardProps) {
   const isWinnerTeam2 = match.winner === match.team2;
   const [scoreTeam1, scoreTeam2] = match.score ? match.score.split(':') : [];
 
+  // 1. Poprawiona logika logotypów - sprawdzamy null oraz błędny string "default.png"
+  const t1Logo = match.team1_logo === "default.png" || !match.team1_logo ? null : match.team1_logo;
+  const t2Logo = match.team2_logo === "default.png" || !match.team2_logo ? null : match.team2_logo;
+
   return (
     <div className="bg-gray-900/60 backdrop-blur-sm border border-gray-800 rounded-2xl p-5 hover:border-gray-700 transition-all duration-200 shadow-lg hover:shadow-gray-900/50">
       <div className="flex justify-between items-center text-sm text-gray-400 mb-4">
@@ -38,19 +42,20 @@ export default function MatchCard({ match }: MatchCardProps) {
       <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
         {/* Team 1 */}
         <div className="flex flex-col items-center w-full sm:w-2/5 gap-2">
-          {match.team1Logo ? (
-            <div className="relative w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center">
+          {t1Logo ? (
+            <div className="relative w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center overflow-hidden">
               <Image
-                src={match.team1Logo}
+                src={t1Logo}
                 alt={match.team1}
                 width={48}
                 height={48}
                 className="object-contain"
+                unoptimized // Pozwala ładować loga z zewnętrznych URL-i bez błędu konfiguracji
               />
             </div>
           ) : (
             <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center">
-              <span className="text-gray-500 text-xs">No logo</span>
+              <span className="text-gray-500 text-[10px] text-center uppercase font-medium">No logo</span>
             </div>
           )}
           <span className={`font-semibold text-center ${isWinnerTeam1 ? 'text-green-400' : 'text-gray-200'}`}>
@@ -61,13 +66,13 @@ export default function MatchCard({ match }: MatchCardProps) {
         {/* Score / VS */}
         <div className="flex flex-col items-center">
           {match.score ? (
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-white">{scoreTeam1}</span>
-              <span className="text-xs font-mono text-gray-500">:</span>
-              <span className="text-lg font-bold text-white">{scoreTeam2}</span>
+            <div className="flex items-center gap-2 bg-gray-800/50 px-3 py-1 rounded-lg border border-gray-700">
+              <span className="text-xl font-bold text-white">{scoreTeam1}</span>
+              <span className="text-sm font-mono text-gray-500">:</span>
+              <span className="text-xl font-bold text-white">{scoreTeam2}</span>
             </div>
           ) : (
-            <span className="text-xs font-mono text-gray-500 bg-gray-800 px-2 py-1 rounded-full">
+            <span className="text-xs font-mono text-gray-500 bg-gray-800 px-2 py-1 rounded-full border border-gray-700">
               VS
             </span>
           )}
@@ -75,19 +80,20 @@ export default function MatchCard({ match }: MatchCardProps) {
 
         {/* Team 2 */}
         <div className="flex flex-col items-center w-full sm:w-2/5 gap-2">
-          {match.team2Logo ? (
-            <div className="relative w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center">
+          {t2Logo ? (
+            <div className="relative w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center overflow-hidden">
               <Image
-                src={match.team2Logo}
+                src={t2Logo}
                 alt={match.team2}
                 width={48}
                 height={48}
                 className="object-contain"
+                unoptimized
               />
             </div>
           ) : (
             <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center">
-              <span className="text-gray-500 text-xs">No logo</span>
+              <span className="text-gray-500 text-[10px] text-center uppercase font-medium">No logo</span>
             </div>
           )}
           <span className={`font-semibold text-center ${isWinnerTeam2 ? 'text-green-400' : 'text-gray-200'}`}>
@@ -100,8 +106,8 @@ export default function MatchCard({ match }: MatchCardProps) {
       {match.winner && (
         <div className="mt-5 pt-3 border-t border-gray-800 flex items-center justify-center gap-2 text-sm">
           <Trophy className="w-4 h-4 text-yellow-500" />
-          <span className="text-gray-300">Winner: </span>
-          <span className="font-medium text-green-400">{match.winner}</span>
+          <span className="text-gray-400 font-light">Winner: </span>
+          <span className="font-bold text-green-400 uppercase tracking-tight">{match.winner}</span>
         </div>
       )}
     </div>
